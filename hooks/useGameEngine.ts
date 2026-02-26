@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { GameResult, GameState } from "@/types";
 import {
   createEmptyBoard,
@@ -23,13 +23,23 @@ const seedBoard = () => {
 };
 
 export const useGameEngine = () => {
-  const [board, setBoard] = useState(seedBoard);
+  const [board, setBoard] = useState(createEmptyBoard);
   const [score, setScore] = useState(0);
   const [moves, setMoves] = useState(0);
   const [status, setStatus] = useState<GameState["status"]>("playing");
   const startTimeRef = useRef(Date.now());
+  const seededRef = useRef(false);
 
   const { addResult, bestScore } = useGameResults(score);
+
+  useEffect(() => {
+    if (seededRef.current) {
+      return;
+    }
+    seededRef.current = true;
+    setBoard(seedBoard());
+    startTimeRef.current = Date.now();
+  }, []);
 
   const gameState = useMemo<GameState>(
     () => ({ board, score, bestScore, moves, status }),
