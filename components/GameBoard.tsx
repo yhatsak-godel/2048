@@ -47,7 +47,7 @@ const getSwipeIndicator = (direction: MoveDirection | null | undefined) => {
 
   return (
     <div 
-      className={`absolute ${positionClass} flex h-12 w-12 items-center justify-center rounded-full bg-amber-500/80 text-3xl text-white shadow-lg backdrop-blur-sm animate-pulse`}
+      className={`absolute ${positionClass} z-50 flex h-12 w-12 items-center justify-center rounded-full bg-amber-500/80 text-3xl text-white shadow-lg backdrop-blur-sm animate-pulse`}
     >
       {config.arrow}
     </div>
