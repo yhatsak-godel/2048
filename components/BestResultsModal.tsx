@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useMemo, useRef } from "react";
-import type { GameResult } from "@/types";
 import { loadResults } from "@/utils/storage";
 
 interface BestResultsModalProps {

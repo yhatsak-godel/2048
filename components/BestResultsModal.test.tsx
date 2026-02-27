@@ -1,4 +1,4 @@
-import { render, screen } from "@testing-library/react";
+import { fireEvent, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { BestResultsModal } from "@/components/BestResultsModal";
 import { loadResults } from "@/utils/storage";
@@ -100,5 +100,25 @@ describe("BestResultsModal", () => {
     expect(screen.getByText("1,024")).toBeInTheDocument();
     expect(screen.getByText("256")).toBeInTheDocument();
     expect(screen.getByText("42")).toBeInTheDocument();
+    // date should be rendered (year is locale-independent)
+    expect(screen.getByRole("listitem")).toHaveTextContent("2024");
+  });
+
+  test("calls onClose when cancel event fires (Escape key)", () => {
+    mockLoadResults.mockReturnValue([]);
+    const onClose = jest.fn();
+    render(<BestResultsModal isOpen onClose={onClose} />);
+    const dialog = screen.getByRole("dialog", { name: /best results/i });
+    fireEvent(dialog, new Event("cancel", { cancelable: true }));
+    expect(onClose).toHaveBeenCalledTimes(1);
+  });
+
+  test("calls onClose when clicking the backdrop (dialog element itself)", () => {
+    mockLoadResults.mockReturnValue([]);
+    const onClose = jest.fn();
+    render(<BestResultsModal isOpen onClose={onClose} />);
+    const dialog = screen.getByRole("dialog", { name: /best results/i });
+    fireEvent.click(dialog);
+    expect(onClose).toHaveBeenCalledTimes(1);
   });
 });
