@@ -6,9 +6,15 @@ import { GameBoard } from "@/components/GameBoard";
 import { GameStatus } from "@/components/GameStatus";
 import { ScoreDisplay } from "@/components/ScoreDisplay";
 import { useGameEngine } from "@/hooks/useGameEngine";
+import { useTouchSwipe } from "@/hooks/useTouchSwipe";
 
 export const GameContainer = () => {
   const { gameState, move, newGame } = useGameEngine();
+  
+  const { swipeDirection, touchHandlers } = useTouchSwipe({
+    onSwipe: move,
+    minSwipeDistance: 30,
+  });
 
   const handleKey = useCallback(
     (event: KeyboardEvent) => {
@@ -55,12 +61,16 @@ export const GameContainer = () => {
       </div>
 
       <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,320px)]">
-        <GameBoard board={gameState.board} />
+        <GameBoard 
+          board={gameState.board} 
+          swipeDirection={swipeDirection}
+          {...touchHandlers}
+        />
         <div className="flex flex-col gap-4">
           <GameStatus status={gameState.status} />
           <Controls onNewGame={newGame} />
           <div className="rounded-2xl bg-white/70 p-4 text-xs uppercase tracking-[0.3em] text-slate-500 shadow-[0_18px_40px_-30px_rgba(15,23,42,0.6)] backdrop-blur">
-            Arrow keys only
+            Swipe or use arrow keys
           </div>
         </div>
       </div>
