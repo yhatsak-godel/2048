@@ -22,16 +22,14 @@ const formatDate = (dateStr: string): string => {
 export const BestResultsModal = ({ isOpen, onClose }: BestResultsModalProps) => {
   const dialogRef = useRef<HTMLDialogElement>(null);
 
-  const results = useMemo(
-    () =>
-      loadResults()
-        .slice()
-        .sort((a, b) => b.score - a.score)
-        .slice(0, 10),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [isOpen]
-  );
+  const results = useMemo(() => {
+    if (!isOpen) return [];
 
+    return loadResults()
+      .slice()
+      .sort((a, b) => b.score - a.score)
+      .slice(0, 10);
+  }, [isOpen]);
   useEffect(() => {
     const dialog = dialogRef.current;
     if (!dialog) return;
