@@ -19,7 +19,7 @@ const mockTouchEvent = (
   return {
     touches,
     changedTouches,
-  } as React.TouchEvent;
+  } as unknown as React.TouchEvent;
 };
 
 describe("useTouchSwipe", () => {
