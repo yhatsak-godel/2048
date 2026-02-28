@@ -18,6 +18,11 @@ const formatDate = (dateStr: string): string => {
   });
 };
 
+/**
+ * BestResultsModal displays the top 10 best scores with player names and game details.
+ * @param isOpen - Whether the modal is open
+ * @param onClose - Callback to close the modal
+ */
 export const BestResultsModal = ({ isOpen, onClose }: BestResultsModalProps) => {
   const dialogRef = useRef<HTMLDialogElement>(null);
 
@@ -61,7 +66,7 @@ export const BestResultsModal = ({ isOpen, onClose }: BestResultsModalProps) => 
       ref={dialogRef}
       onClick={handleBackdropClick}
       aria-label="Best results"
-      className="w-full max-w-lg rounded-3xl bg-white p-0 shadow-[0_30px_80px_-20px_rgba(15,23,42,0.5)] backdrop:bg-slate-900/40 backdrop:backdrop-blur-sm"
+      className="fixed left-1/2 top-1/2 mx-4 w-full max-w-lg -translate-x-1/2 -translate-y-1/2 rounded-3xl bg-white p-0 shadow-[0_30px_80px_-20px_rgba(15,23,42,0.5)] backdrop:bg-slate-900/40 backdrop:backdrop-blur-sm sm:mx-0"
     >
       <div className="flex flex-col">
         {/* Header */}
@@ -99,9 +104,14 @@ export const BestResultsModal = ({ isOpen, onClose }: BestResultsModalProps) => 
                     {index + 1}
                   </span>
                   <div className="flex flex-1 flex-wrap items-center justify-between gap-x-4 gap-y-1">
-                    <span className="text-lg font-bold text-slate-900">
-                      {result.score.toLocaleString()}
-                    </span>
+                    <div>
+                      <span className="block text-lg font-bold text-slate-900">
+                        {result.score.toLocaleString()}
+                      </span>
+                      <span className="text-xs font-medium text-slate-600" aria-label="Player name">
+                        {result.playerName}
+                      </span>
+                    </div>
                     <div className="flex items-center gap-3 text-xs text-slate-500">
                       <span>
                         Max&nbsp;

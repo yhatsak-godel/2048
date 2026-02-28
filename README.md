@@ -62,6 +62,33 @@ npm run test:coverage
 - utils/ - Game logic and storage utilities
 - types/ - Shared TypeScript interfaces
 
+## Development Standards
+
+This project follows strict quality standards defined in the [Project Constitution](.specify/memory/constitution.md):
+
+**Code Quality**
+- TypeScript strict mode with zero type bypasses
+- ESLint passing with zero warnings
+- JSDoc comments for all exports
+
+**Testing**
+- Minimum 80% code coverage required
+- Every component has corresponding `.test.tsx` file
+- Tests follow Arrange-Act-Assert pattern
+
+**Accessibility**
+- WCAG 2.1 Level AA compliance
+- Keyboard navigation for all interactive elements
+- ARIA labels where semantic HTML insufficient
+- 4.5:1 color contrast ratio
+
+Run quality checks:
+
+```bash
+npm run lint         # ESLint verification
+npm run test:coverage  # Verify 80% coverage threshold
+```
+
 ## Notes
 
 - Keyboard controls use ArrowUp, ArrowDown, ArrowLeft, ArrowRight.

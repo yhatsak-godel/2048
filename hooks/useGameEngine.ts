@@ -13,6 +13,7 @@ import {
   spawnNewTile,
 } from "@/utils/gameEngine";
 import { useGameResults } from "@/hooks/useGameResults";
+import { loadPlayerName } from "@/utils/storage";
 
 export type MoveDirection = "left" | "right" | "up" | "down";
 
@@ -23,23 +24,23 @@ const seedBoard = () => {
 };
 
 export const useGameEngine = () => {
-  const [board, setBoard] = useState(createEmptyBoard);
+  const [board, setBoard] = useState(() => createEmptyBoard());
   const [score, setScore] = useState(0);
   const [moves, setMoves] = useState(0);
   const [status, setStatus] = useState<GameState["status"]>("playing");
-  const startTimeRef = useRef(Date.now());
-  const seededRef = useRef(false);
+  const [startTime] = useState(() => Date.now());
+  const startTimeRef = useRef(startTime);
+  const [isInitialized, setIsInitialized] = useState(false);
+
+  // Initialize board with random tiles on client-side only to avoid hydration mismatch
+  useEffect(() => {
+    if (!isInitialized) {
+      setBoard(seedBoard());
+      setIsInitialized(true);
+    }
+  }, [isInitialized]);
 
   const { addResult, bestScore } = useGameResults(score);
-
-  useEffect(() => {
-    if (seededRef.current) {
-      return;
-    }
-    seededRef.current = true;
-    setBoard(seedBoard());
-    startTimeRef.current = Date.now();
-  }, []);
 
   const gameState = useMemo<GameState>(
     () => ({ board, score, bestScore, moves, status }),
@@ -57,6 +58,7 @@ export const useGameEngine = () => {
         maxTile: getMaxTile(finalBoard),
         date: new Date().toISOString(),
         duration: Date.now() - startTimeRef.current,
+        playerName: loadPlayerName(),
       };
       addResult(result);
     },

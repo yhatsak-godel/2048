@@ -1,6 +1,5 @@
 import { renderHook, act } from "@testing-library/react";
 import { useTouchSwipe } from "@/hooks/useTouchSwipe";
-import type { MoveDirection } from "@/hooks/useGameEngine";
 
 const createTouchEvent = (clientX: number, clientY: number): Partial<Touch> => ({
   clientX,

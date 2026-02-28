@@ -30,6 +30,7 @@ const mockResults = (count: number) =>
     moves: 50 + i,
     date: new Date(2024, 0, i + 1).toISOString(),
     duration: 120,
+    playerName: "Player",
   }));
 
 describe("BestResultsModal", () => {
@@ -57,9 +58,9 @@ describe("BestResultsModal", () => {
 
   test("displays results sorted by score descending", () => {
     const results = [
-      { score: 200, maxTile: 32, moves: 10, date: "2024-01-01", duration: 60 },
-      { score: 500, maxTile: 64, moves: 20, date: "2024-01-02", duration: 90 },
-      { score: 100, maxTile: 16, moves: 5, date: "2024-01-03", duration: 30 },
+      { score: 200, maxTile: 32, moves: 10, date: "2024-01-01", duration: 60, playerName: "Player" },
+      { score: 500, maxTile: 64, moves: 20, date: "2024-01-02", duration: 90, playerName: "Player" },
+      { score: 100, maxTile: 16, moves: 5, date: "2024-01-03", duration: 30, playerName: "Player" },
     ];
     mockLoadResults.mockReturnValue(results);
     render(<BestResultsModal isOpen onClose={jest.fn()} />);
@@ -93,7 +94,7 @@ describe("BestResultsModal", () => {
 
   test("each entry shows score, maxTile, moves and date", () => {
     const results = [
-      { score: 1024, maxTile: 256, moves: 42, date: "2024-06-15", duration: 180 },
+      { score: 1024, maxTile: 256, moves: 42, date: "2024-06-15", duration: 180, playerName: "Player" },
     ];
     mockLoadResults.mockReturnValue(results);
     render(<BestResultsModal isOpen onClose={jest.fn()} />);
@@ -102,6 +103,26 @@ describe("BestResultsModal", () => {
     expect(screen.getByText("42")).toBeInTheDocument();
     // date should be rendered (year is locale-independent)
     expect(screen.getByRole("listitem")).toHaveTextContent("2024");
+  });
+
+  test("displays player name for each result", () => {
+    const results = [
+      { score: 500, maxTile: 64, moves: 20, date: "2024-01-02", duration: 90, playerName: "Alice" },
+      { score: 300, maxTile: 32, moves: 15, date: "2024-01-01", duration: 60, playerName: "Bob" },
+    ];
+    mockLoadResults.mockReturnValue(results);
+    render(<BestResultsModal isOpen onClose={jest.fn()} />);
+    expect(screen.getByText("Alice")).toBeInTheDocument();
+    expect(screen.getByText("Bob")).toBeInTheDocument();
+  });
+
+  test("displays default player name for legacy results without playerName field", () => {
+    const results = [
+      { score: 100, maxTile: 16, moves: 5, date: "2024-01-03", duration: 30, playerName: "Player" },
+    ];
+    mockLoadResults.mockReturnValue(results);
+    render(<BestResultsModal isOpen onClose={jest.fn()} />);
+    expect(screen.getByText("Player")).toBeInTheDocument();
   });
 
   test("calls onClose when cancel event fires (Escape key)", () => {
