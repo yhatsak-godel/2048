@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { GameResult, GameState } from "@/types";
 import {
   createEmptyBoard,
@@ -24,12 +24,21 @@ const seedBoard = () => {
 };
 
 export const useGameEngine = () => {
-  const [board, setBoard] = useState(seedBoard);
+  const [board, setBoard] = useState(() => createEmptyBoard());
   const [score, setScore] = useState(0);
   const [moves, setMoves] = useState(0);
   const [status, setStatus] = useState<GameState["status"]>("playing");
   const [startTime] = useState(() => Date.now());
   const startTimeRef = useRef(startTime);
+  const [isInitialized, setIsInitialized] = useState(false);
+
+  // Initialize board with random tiles on client-side only to avoid hydration mismatch
+  useEffect(() => {
+    if (!isInitialized) {
+      setBoard(seedBoard());
+      setIsInitialized(true);
+    }
+  }, [isInitialized]);
 
   const { addResult, bestScore } = useGameResults(score);
 

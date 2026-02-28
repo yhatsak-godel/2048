@@ -66,7 +66,7 @@ export const BestResultsModal = ({ isOpen, onClose }: BestResultsModalProps) => 
       ref={dialogRef}
       onClick={handleBackdropClick}
       aria-label="Best results"
-      className="w-full max-w-lg rounded-3xl bg-white p-0 shadow-[0_30px_80px_-20px_rgba(15,23,42,0.5)] backdrop:bg-slate-900/40 backdrop:backdrop-blur-sm"
+      className="fixed left-1/2 top-1/2 mx-4 w-full max-w-lg -translate-x-1/2 -translate-y-1/2 rounded-3xl bg-white p-0 shadow-[0_30px_80px_-20px_rgba(15,23,42,0.5)] backdrop:bg-slate-900/40 backdrop:backdrop-blur-sm sm:mx-0"
     >
       <div className="flex flex-col">
         {/* Header */}
