@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import type { PlayerName } from "@/types";
 import {
   hasStoredPlayerName,
@@ -20,8 +20,19 @@ const DEFAULT_PLAYER_NAME: PlayerName = "Player";
  * Manages the player name lifecycle, including first-load prompting and persistence.
  */
 export const usePlayerName = () => {
-  const [playerName, setPlayerName] = useState<PlayerName>(() => loadPlayerName());
-  const [isPromptOpen, setIsPromptOpen] = useState(() => !hasStoredPlayerName());
+  // Initialize with safe defaults for SSR/CSR consistency
+  const [playerName, setPlayerName] = useState<PlayerName>(DEFAULT_PLAYER_NAME);
+  const [isPromptOpen, setIsPromptOpen] = useState(false);
+
+  // Load persisted name and check if prompt should open after hydration
+  useEffect(() => {
+    const storedName = loadPlayerName();
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setPlayerName(storedName);
+    if (!hasStoredPlayerName()) {
+      setIsPromptOpen(true);
+    }
+  }, []);
 
   const saveName = useCallback((value: string): SaveResult => {
     const normalized = normalizePlayerName(value);
