@@ -28,8 +28,7 @@ export const useGameEngine = () => {
   const [score, setScore] = useState(0);
   const [moves, setMoves] = useState(0);
   const [status, setStatus] = useState<GameState["status"]>("playing");
-  const [startTime] = useState(() => Date.now());
-  const startTimeRef = useRef(startTime);
+  const startTimeRef = useRef<number>(Date.now());
   const [isInitialized, setIsInitialized] = useState(false);
 
   // Initialize board with random tiles on client-side only to avoid hydration mismatch
@@ -52,15 +51,20 @@ export const useGameEngine = () => {
       if (finalStatus !== "lost") {
         return;
       }
-      const result: GameResult = {
-        score: finalScore,
-        moves: finalMoves,
-        maxTile: getMaxTile(finalBoard),
-        date: new Date().toISOString(),
-        duration: Date.now() - startTimeRef.current,
-        playerName: loadPlayerName(),
-      };
-      addResult(result);
+
+      try {
+        const result: GameResult = {
+          score: finalScore,
+          moves: finalMoves,
+          maxTile: getMaxTile(finalBoard),
+          date: new Date().toISOString(),
+          duration: Date.now() - startTimeRef.current,
+          playerName: loadPlayerName(),
+        };
+        addResult(result);
+      } catch (error) {
+        console.error("Failed to finalize game result", error);
+      }
     },
     [addResult]
   );
@@ -86,29 +90,39 @@ export const useGameEngine = () => {
         down: moveDown,
       } as const;
 
-      const result = actionMap[direction](board);
-      if (!result.changed) {
+      const action = actionMap[direction];
+      if (!action) {
+        console.warn(`Unknown move direction: ${direction}`);
         return;
       }
 
-      const spawned = spawnNewTile(result.board);
-      const nextBoard = spawned.board;
-      const nextScore = score + result.scoreGained;
-      const nextMoves = moves + 1;
-      let nextStatus: GameState["status"] = status;
+      try {
+        const result = action(board);
+        if (!result.changed) {
+          return;
+        }
 
-      if (getMaxTile(nextBoard) >= 2048 && status !== "won") {
-        nextStatus = "won";
-      }
-      if (!hasValidMoves(nextBoard)) {
-        nextStatus = "lost";
-      }
+        const spawned = spawnNewTile(result.board);
+        const nextBoard = spawned.board;
+        const nextScore = score + result.scoreGained;
+        const nextMoves = moves + 1;
+        let nextStatus: GameState["status"] = status;
 
-      setBoard(nextBoard);
-      setScore(nextScore);
-      setMoves(nextMoves);
-      setStatus(nextStatus);
-      finalizeResult(nextStatus, nextBoard, nextScore, nextMoves);
+        if (getMaxTile(nextBoard) >= 2048 && status !== "won") {
+          nextStatus = "won";
+        }
+        if (!hasValidMoves(nextBoard)) {
+          nextStatus = "lost";
+        }
+
+        setBoard(nextBoard);
+        setScore(nextScore);
+        setMoves(nextMoves);
+        setStatus(nextStatus);
+        finalizeResult(nextStatus, nextBoard, nextScore, nextMoves);
+      } catch (error) {
+        console.error("Failed to apply move", error);
+      }
     },
     [board, moves, score, status, finalizeResult]
   );
