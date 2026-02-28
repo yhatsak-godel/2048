@@ -1,29 +1,31 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import type { GameResult } from "@/types";
+import type { GameResult, PlayerName } from "@/types";
 import {
   clearResults as clearStoredResults,
   limitResults,
   loadBestScore,
+  loadPlayerName,
   loadResults,
   saveBestScore,
   saveResults,
 } from "@/utils/storage";
 
-export const useGameResults = (currentScore?: number) => {
-  const [results, setResults] = useState<GameResult[]>([]);
-  const [bestScore, setBestScore] = useState(0);
+type GameResultInput = Omit<GameResult, "playerName"> & {
+  playerName?: PlayerName;
+};
 
-  useEffect(() => {
-    setResults(loadResults());
-    setBestScore(loadBestScore());
-  }, []);
+export const useGameResults = (currentScore?: number, playerName?: PlayerName) => {
+  const [results, setResults] = useState<GameResult[]>(() => loadResults());
+  const [bestScore, setBestScore] = useState(() => loadBestScore());
 
   useEffect(() => {
     if (typeof currentScore !== "number") {
       return;
     }
+    // Synchronizing with external localStorage when score changes
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setBestScore((prev) => {
       if (currentScore > prev) {
         saveBestScore(currentScore);
@@ -33,20 +35,28 @@ export const useGameResults = (currentScore?: number) => {
     });
   }, [currentScore]);
 
-  const addResult = useCallback((result: GameResult) => {
-    setResults((prev) => {
-      const next = limitResults([result, ...prev]);
-      saveResults(next);
-      return next;
-    });
-    setBestScore((prev) => {
-      if (result.score > prev) {
-        saveBestScore(result.score);
-        return result.score;
-      }
-      return prev;
-    });
-  }, []);
+  const addResult = useCallback(
+    (result: GameResultInput) => {
+      const resolvedPlayerName = result.playerName ?? playerName ?? loadPlayerName();
+      const normalizedResult: GameResult = {
+        ...result,
+        playerName: resolvedPlayerName,
+      };
+      setResults((prev) => {
+        const next = limitResults([normalizedResult, ...prev]);
+        saveResults(next);
+        return next;
+      });
+      setBestScore((prev) => {
+        if (normalizedResult.score > prev) {
+          saveBestScore(normalizedResult.score);
+          return normalizedResult.score;
+        }
+        return prev;
+      });
+    },
+    [playerName]
+  );
 
   const clearResults = useCallback(() => {
     setResults([]);

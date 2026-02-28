@@ -18,6 +18,11 @@ const formatDate = (dateStr: string): string => {
   });
 };
 
+/**
+ * BestResultsModal displays the top 10 best scores with player names and game details.
+ * @param isOpen - Whether the modal is open
+ * @param onClose - Callback to close the modal
+ */
 export const BestResultsModal = ({ isOpen, onClose }: BestResultsModalProps) => {
   const dialogRef = useRef<HTMLDialogElement>(null);
 
@@ -99,9 +104,14 @@ export const BestResultsModal = ({ isOpen, onClose }: BestResultsModalProps) => 
                     {index + 1}
                   </span>
                   <div className="flex flex-1 flex-wrap items-center justify-between gap-x-4 gap-y-1">
-                    <span className="text-lg font-bold text-slate-900">
-                      {result.score.toLocaleString()}
-                    </span>
+                    <div>
+                      <span className="block text-lg font-bold text-slate-900">
+                        {result.score.toLocaleString()}
+                      </span>
+                      <span className="text-xs font-medium text-slate-600" aria-label="Player name">
+                        {result.playerName}
+                      </span>
+                    </div>
                     <div className="flex items-center gap-3 text-xs text-slate-500">
                       <span>
                         Max&nbsp;

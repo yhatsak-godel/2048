@@ -6,12 +6,15 @@ export interface GameState {
   status: "playing" | "won" | "lost";
 }
 
+export type PlayerName = string;
+
 export interface GameResult {
   score: number;
   moves: number;
   maxTile: number;
   date: string;
   duration: number;
+  playerName: PlayerName;
 }
 
 export interface Position {
