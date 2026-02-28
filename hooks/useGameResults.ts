@@ -17,9 +17,18 @@ type GameResultInput = Omit<GameResult, "playerName"> & {
 };
 
 export const useGameResults = (currentScore?: number, playerName?: PlayerName) => {
-  const [results, setResults] = useState<GameResult[]>(() => loadResults());
-  const [bestScore, setBestScore] = useState(() => loadBestScore());
+  // Initialize with safe defaults to ensure SSR/CSR hydration consistency
+  const [results, setResults] = useState<GameResult[]>([]);
+  const [bestScore, setBestScore] = useState(0);
 
+  // Load persisted values after hydration completes
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setResults(loadResults());
+    setBestScore(loadBestScore());
+  }, []);
+
+  // Synchronize best score when current game score changes
   useEffect(() => {
     if (typeof currentScore !== "number") {
       return;
